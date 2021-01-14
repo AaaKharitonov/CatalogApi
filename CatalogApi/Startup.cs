@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace CatalogApi
 {
@@ -32,6 +33,9 @@ namespace CatalogApi
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "CatalogApi", Version = "v1" });
             });
+
+            services.AddDbContext<DefaultDbContext>(options =>
+                options.UseNpgsql("Server=127.0.0.1; Port=5432; Database=catalogs_db; User Id=catalogs_db; Password=catalogs_db;"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
