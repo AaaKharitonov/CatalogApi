@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
 
 namespace CatalogApi
 {
@@ -30,9 +33,31 @@ namespace CatalogApi
 
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<Post> Posts { get; set; }
+    }
 
-        //used in Update-Database
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseNpgsql("Server=127.0.0.1; Port=5432; Database=catalogs_db; User Id=catalogs_db; Password=catalogs_db;");
+    //for migrations
+    public class DefaultDbContextDesignFactory : IDesignTimeDbContextFactory<DefaultDbContext>
+    {
+        public DefaultDbContext CreateDbContext(string[] args)
+        {
+            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+            IConfigurationRoot configuration = new ConfigurationBuilder()
+                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                .AddJsonFile("appsettings.json")
+                .AddJsonFile($"appsettings.{env}.json", true)
+                .AddEnvironmentVariables()
+                .Build();
+
+            var connectionString = configuration["APPSETTINGS:DBSETTINGS:CONNECTIONSTRING"];
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new InvalidOperationException("Db connection string is null or empty");
+
+            var optionsBuilder = new DbContextOptionsBuilder<DefaultDbContext>()
+                .UseNpgsql(connectionString);
+
+            return new DefaultDbContext(optionsBuilder.Options);
+        }
     }
 }
