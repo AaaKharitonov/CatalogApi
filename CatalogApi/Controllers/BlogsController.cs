@@ -9,6 +9,7 @@ using CatalogApi;
 
 namespace CatalogApi.Controllers
 {
+    //scaffolding
     [Route("api/[controller]")]
     [ApiController]
     public class BlogsController : ControllerBase
