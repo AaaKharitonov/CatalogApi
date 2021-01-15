@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CatalogApi;
+using CatalogApi.DAL;
+using CatalogApi.Domain;
 
 namespace CatalogApi.Controllers
 {

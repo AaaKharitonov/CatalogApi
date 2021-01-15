@@ -1,29 +1,12 @@
 using System;
-using System.Collections.Generic;
+using CatalogApi.Domain;
+using CatalogApi.Domain.Catalogs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
-namespace CatalogApi
+namespace CatalogApi.DAL
 {
-    public class Blog
-    {
-        public int BlogId { get; set; }
-        public string Url { get; set; }
-
-        public List<Post> Posts { get; set; }
-    }
-
-    public class Post
-    {
-        public int PostId { get; set; }
-        public string Title { get; set; }
-        public string Content { get; set; }
-
-        public int BlogId { get; set; }
-        public Blog Blog { get; set; }
-    }
-
     public class DefaultDbContext : DbContext
     {
         public DefaultDbContext(DbContextOptions<DefaultDbContext> options)
@@ -33,6 +16,7 @@ namespace CatalogApi
 
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<Post> Posts { get; set; }
+        public DbSet<SimpleCatalog> SimpleCatalogs { get; set; }
     }
 
     //for migrations
