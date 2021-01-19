@@ -8,7 +8,7 @@ password: postgres
 
 CREATE DATABASE catalogs_db;
 CREATE USER catalogs_db WITH PASSWORD 'catalogs_db';
-GRANT ALL PRIVILEGES ON DATABASE test_db TO catalogs_db;
+GRANT ALL PRIVILEGES ON DATABASE catalogs_db TO catalogs_db;
 
 --ef migrations
 -- install Microsoft.EntityFrameworkCore.Tools
