@@ -71,11 +71,16 @@ namespace CatalogApi
             return null;
         }
 
-        //WARNING!!!
+        //Warning!!! no checks
         public EntityInfo this[Type type] => _dict[type];
+        public EntityInfo this[string route] => _dict.SingleOrDefault(x => x.Value.Route == route).Value;
 
         public IEnumerable<string> GetTableNames() => _dict.Select(x => x.Value.TableName);
+        public IEnumerable<string> GetRoutes() => _dict.Select(x => x.Value.Route);
         public IEnumerable<Type> GetTypes() => _dict.Select(x => x.Key);
+
+        public IEnumerable<EntityInfo> GetInfos() => _dict.Values;
+
         public string GetInfo(Type type) => _dict[type].ToString();
     }
 }

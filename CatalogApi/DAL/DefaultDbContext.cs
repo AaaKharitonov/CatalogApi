@@ -1,6 +1,9 @@
 using System;
+using CatalogApi.DAL.EntityConfigurations.Blogs;
 using CatalogApi.Domain;
+using CatalogApi.Domain.Blogs;
 using CatalogApi.Domain.Catalogs;
+using CatalogApi.Domain.Employees;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
@@ -14,9 +17,28 @@ namespace CatalogApi.DAL
         {
         }
 
+        public DbSet<User> Users { get; set; }
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<Post> Posts { get; set; }
+        public DbSet<Tag> Tags { get; set; }
+        public DbSet<PostTag> PostTags { get; set; }
+
+        public DbSet<Employee> Employees { get; set; }
+        public DbSet<Department> Departments { get; set; }
+
         public DbSet<SimpleCatalog> SimpleCatalogs { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            //Blogs
+            modelBuilder.ApplyConfiguration(new BlogEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new PostEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new PostTagEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new TagEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new UserEntityTypeConfiguration());
+        }
     }
 
     //for migrations
