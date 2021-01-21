@@ -75,7 +75,7 @@ namespace CatalogApi.Controllers
         public async Task<ActionResult<IEnumerable<T>>> GetDapper() => (await _queries.GetAsync<T>()).ToList();
 
         [HttpGet("dapper/{id}")]
-        public async Task<ActionResult<T>> GetDapper(int id)
+        public async Task<ActionResult<T>> GetDapper([FromRoute] int id)
         {
             var entity = await _queries.GetAsync<T>(id);
 
@@ -88,7 +88,7 @@ namespace CatalogApi.Controllers
         public async Task<ActionResult<IEnumerable<T>>> Get() => await _rep.GetAsync();
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<T>> Get(int id)
+        public async Task<ActionResult<T>> Get([FromRoute] int id)
         {
             var entity = await _rep.GetAsync(id);
 
@@ -98,7 +98,7 @@ namespace CatalogApi.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, T entity)
+        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] T entity)
         {
             if (id != entity.Id) return BadRequest();
 
@@ -122,15 +122,17 @@ namespace CatalogApi.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<T>> Post(T entity)
+        public async Task<ActionResult<T>> Post([FromBody] T entity)
         {
+            //await this.HttpContext.Request
+
             await _rep.CreateAsync(entity);
 
             return CreatedAtAction("Get", new { id = entity.Id }, entity);
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<T>> Delete(int id)
+        public async Task<ActionResult<T>> Delete([FromRoute] int id)
         {
             var entity = await _rep.GetAsync(id);
 

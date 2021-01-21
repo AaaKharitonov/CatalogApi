@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
+﻿using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading;
 using System.Threading.Tasks;
+using CatalogApi.Domain.Catalogs;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -12,6 +12,30 @@ using Xunit.Abstractions;
 
 namespace CatalogApi.Tests.IntegrationTests
 {
+    public class HttpClientMessageHandler : DelegatingHandler
+    {
+        private readonly ITestOutputHelper _output;
+
+        public HttpClientMessageHandler(HttpMessageHandler innerHandler, ITestOutputHelper output)
+            : base(innerHandler) => _output = output;
+
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            _output.WriteLine($"Request: \n {request}");
+            if (request.Content != null)
+            {
+                _output.WriteLine(await request.Content.ReadAsStringAsync());
+            }
+            _output.WriteLine("");
+
+            HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
+
+            _output.WriteLine($"Response: \n {response} \n {await response.Content.ReadAsStringAsync()}");
+
+            return response;
+        }
+    }
+
     public class CatalogsControllerTest
     {
         private readonly ITestOutputHelper _output;
@@ -22,31 +46,114 @@ namespace CatalogApi.Tests.IntegrationTests
         {
             _output = output;
             _applicationUrl = "http://localhost:5000";
-            _client = new HttpClient();
+            _client = new HttpClient(new HttpClientMessageHandler(new HttpClientHandler(), output));
         }
 
         [Theory]
         [InlineData("simple")]
-        [InlineData("1")]
-        [InlineData("2")]
-        public async Task Test(string route)
+        [InlineData("not_existing_route")]
+        public async Task GetAll(string route)
         {
-            _output.WriteLine($"Test2 val: {route}");
+            var url = $"{_applicationUrl}/{route}";
 
             try
             {
-                HttpResponseMessage response = await _client.GetAsync($"{_applicationUrl}/{route}");
-
+                HttpResponseMessage response = await _client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
-
-                string responseBody = await response.Content.ReadAsStringAsync();
-
-                _output.WriteLine(responseBody);
             }
             catch (HttpRequestException e)
             {
-                _output.WriteLine("Exception Caught!");
-                _output.WriteLine("Message :{0} ", e.Message);
+                _output.WriteLine($"Exception message :{e.Message}");
+            }
+        }
+
+        [Theory]
+        [InlineData("simple", 1)]
+        [InlineData("simple", 2)]
+        [InlineData("not_existing_route", 1)]
+        public async Task Get(string route, int id)
+        {
+            var url = $"{_applicationUrl}/{route}/{id}";
+
+            try
+            {
+                HttpResponseMessage response = await _client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException e)
+            {
+                _output.WriteLine($"Exception message :{e.Message}");
+            }
+        }
+
+        [Theory]
+        [InlineData("simple")]
+        [InlineData("not_existing_route")]
+        public async Task Post(string route)
+        {
+            var url = $"{_applicationUrl}/{route}";
+
+            try
+            {
+                SimpleCatalog simpleCatalog = new SimpleCatalog
+                {
+                    Id = 2,
+                    Name = "Name2",
+                    Val = 200
+                };
+
+                HttpResponseMessage response = await _client.PostAsJsonAsync(url, simpleCatalog);
+
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException e)
+            {
+                _output.WriteLine($"Exception message :{e.Message}");
+            }
+        }
+
+        [Theory]
+        [InlineData("simple", 1)]
+        [InlineData("simple", 2)]
+        [InlineData("not_existing_route", 1)]
+        public async Task Put(string route, int id)
+        {
+            var url = $"{_applicationUrl}/{route}/{id}";
+
+            SimpleCatalog simpleCatalog = new SimpleCatalog
+            {
+                Id = 2,
+                Name = "NewName",
+                Val = 200000
+            };
+
+            try
+            {
+                HttpResponseMessage response = await _client.PutAsJsonAsync(url, simpleCatalog);
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException e)
+            {
+                _output.WriteLine($"Exception message :{e.Message}");
+            }
+        }
+
+        [Theory]
+        [InlineData("simple", 1)]
+        [InlineData("simple", 2)]
+        [InlineData("not_existing_route", 1)]
+        public async Task Delete(string route, int id)
+        {
+            var url = $"{_applicationUrl}/{route}/{id}";
+
+            try
+            {
+                HttpResponseMessage response = await _client.DeleteAsync(url);
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException e)
+            {
+                _output.WriteLine($"Exception message :{e.Message}");
             }
         }
     }
