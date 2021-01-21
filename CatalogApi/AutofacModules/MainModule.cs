@@ -64,6 +64,10 @@ namespace CatalogApi.AutofacModules
             builder.Register(c => new EntitiesInfoService(c.Resolve<Func<DefaultDbContext>>()))
                 .As<EntitiesInfoService>()
                 .SingleInstance();
+
+            builder.Register(c => new EntitiesGeneratorService(c.Resolve<EntitiesInfoService>()))
+                .As<EntitiesGeneratorService>()
+                .SingleInstance();
         }
     }
 }
