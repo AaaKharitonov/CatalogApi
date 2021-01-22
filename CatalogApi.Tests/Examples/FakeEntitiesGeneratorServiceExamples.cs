@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using CatalogApi.DAL;
 using CatalogApi.Domain.Blogs;
 using CatalogApi.Domain.Catalogs;

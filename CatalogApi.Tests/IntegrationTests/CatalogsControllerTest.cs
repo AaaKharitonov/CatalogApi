@@ -1,10 +1,12 @@
 ﻿using System.Net.Http;
 using System.Net.Http.Json;
-using System.Threading;
 using System.Threading.Tasks;
 using CatalogApi.Domain.Catalogs;
+using CatalogApi.Tests.Utilities;
 using Xunit;
 using Xunit.Abstractions;
+
+//HttpClient - for CatalogsController
 
 // 1. Run api in vs in Debug mode. 
 // 2. Resharper Unit Test Session -> Options -> Build Policy: Never 
@@ -12,30 +14,6 @@ using Xunit.Abstractions;
 
 namespace CatalogApi.Tests.IntegrationTests
 {
-    public class HttpClientMessageHandler : DelegatingHandler
-    {
-        private readonly ITestOutputHelper _output;
-
-        public HttpClientMessageHandler(HttpMessageHandler innerHandler, ITestOutputHelper output)
-            : base(innerHandler) => _output = output;
-
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            _output.WriteLine($"Request: \n {request}");
-            if (request.Content != null)
-            {
-                _output.WriteLine(await request.Content.ReadAsStringAsync());
-            }
-            _output.WriteLine("");
-
-            HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
-
-            _output.WriteLine($"Response: \n {response} \n {await response.Content.ReadAsStringAsync()}");
-
-            return response;
-        }
-    }
-
     public class CatalogsControllerTest
     {
         private readonly ITestOutputHelper _output;
