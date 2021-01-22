@@ -7,15 +7,16 @@ using CatalogApi.Domain.Employees;
 
 namespace CatalogApi
 {
-    public class EntitiesGeneratorService
+    public class FakeEntitiesGeneratorService
     {
         private readonly EntitiesInfoService _infoService;
         private readonly Dictionary<Type, Func<int, IEnumerable<object>>> _dict;
 
-        public EntitiesGeneratorService(EntitiesInfoService infoService)
+        public FakeEntitiesGeneratorService(EntitiesInfoService infoService)
         {
             _infoService = infoService;
             _dict = new Dictionary<Type, Func<int, IEnumerable<object>>>();
+            SetGenerateFuncs();
         }
 
         private void SetGenerateFuncs()
@@ -149,6 +150,16 @@ namespace CatalogApi
             }
 
             return null;
+        }
+
+        public IEnumerable<object> Generate(string route, int len)
+        {
+            var info = _infoService[route];
+
+            if (info == null)
+                return null;
+            
+            return Generate(info.Type, len);
         }
     }
 }

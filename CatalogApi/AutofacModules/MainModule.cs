@@ -65,8 +65,8 @@ namespace CatalogApi.AutofacModules
                 .As<EntitiesInfoService>()
                 .SingleInstance();
 
-            builder.Register(c => new EntitiesGeneratorService(c.Resolve<EntitiesInfoService>()))
-                .As<EntitiesGeneratorService>()
+            builder.Register(c => new FakeEntitiesGeneratorService(c.Resolve<EntitiesInfoService>()))
+                .As<FakeEntitiesGeneratorService>()
                 .SingleInstance();
         }
     }
